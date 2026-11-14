@@ -55,7 +55,11 @@ app.get("/api/categories", async (_, res) => {
     const r = await sb("products", { params: { select: "category", limit: "1000" } });
     const d = await r.json();
     const cats = [...new Set((d || []).map(p => p.category).filter(Boolean))].sort();
-    res.json(cats);
+    const imgR = await sb("products", { params: { select: "category,image_url", image_url: "not.is.null", limit: "500" } });
+    const imgD = await imgR.json();
+    const catImages = {};
+    (imgD || []).forEach(p => { if (p.category && p.image_url && !catImages[p.category]) catImages[p.category] = p.image_url; });
+    res.json({ categories: cats.map(c => ({ slug: c, label: c, image: catImages[c] || "" })) });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
@@ -63,7 +67,7 @@ app.get("/api/products", async (req, res) => {
   try {
     const { search, category, limit } = req.query;
     const q = { select: "*", order: "created_at.desc", limit: String(Math.min(parseInt(limit) || 500, 1000)) };
-    if (category && !search) q.params = { category: `eq.${category}`, order: "created_at.desc", limit: q.limit, select: q.select };
+    if (category && !search) q.category = `eq.${category}`;
     const r = await sb("products", { params: q });
     let data = await r.json();
     if (search) {
@@ -73,7 +77,7 @@ app.get("/api/products", async (req, res) => {
         return terms.every(t => hay.includes(t));
       });
     }
-    res.json(data || []);
+    res.json({ products: data || [], total: (data || []).length });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 

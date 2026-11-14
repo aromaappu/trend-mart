@@ -20,7 +20,7 @@ export async function api(path, { method = "GET", body, form } = {}) {
   const res = await fetch(`/api${path}`, {
     method,
     headers,
-    body: form ? form : body ? JSON.stringify(body) : undefined
+    body: form ? form : body ? JSON.stringify(body) : undefined,
   });
 
   let data = {};

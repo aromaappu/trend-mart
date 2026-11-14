@@ -552,7 +552,7 @@
         const SUPABASE_URL = CFG.SUPABASE_URL || '';
         const SUPABASE_ANON_KEY = CFG.SUPABASE_ANON_KEY || '';
         const SUPABASE_SERVICE_KEY = CFG.SUPABASE_SERVICE_KEY || '';
-        const ADMIN_PASSWORD = CFG.ADMIN_PASSWORD || '***REMOVED***';
+        const ADMIN_PASSWORD = CFG.ADMIN_PASSWORD || '';
         const DB_ENABLED = !!CFG.ENABLE_DB;
         const BUCKET = 'product-images';
 
@@ -580,7 +580,7 @@
 
         function doLogin() {
             const v = document.getElementById('pass').value;
-            if (v === ADMIN_PASSWORD) {
+            if (ADMIN_PASSWORD && v === ADMIN_PASSWORD) {
                 try { sessionStorage.setItem('tm_admin', '1'); } catch (e) {}
                 enterApp();
             } else {
